@@ -17,6 +17,7 @@ type FeedbackRequest struct {
 type FeedbackResponse struct {
 	ID        string    `json:"id"`
 	Status    string    `json:"status"`
+	Message   string    `json:"message"`
 	CreatedAt time.Time `json:"createdAt"`
 }
 
@@ -51,6 +52,7 @@ func FeedbackHandler(w http.ResponseWriter, r *http.Request) {
 	resp := FeedbackResponse{
 		ID:        "fb_" + time.Now().UTC().Format("20060102150405"),
 		Status:    "received",
+		Message:   "Thank you for your feedback!",
 		CreatedAt: time.Now().UTC(),
 	}
 

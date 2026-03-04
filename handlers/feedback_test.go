@@ -32,6 +32,10 @@ func TestFeedbackHandler_Success(t *testing.T) {
 	if !strings.HasPrefix(resp.ID, "fb_") {
 		t.Errorf("expected ID to start with 'fb_', got %s", resp.ID)
 	}
+
+	if resp.Message != "Thank you for your feedback!" {
+		t.Errorf("expected message 'Thank you for your feedback!', got %s", resp.Message)
+	}
 }
 
 func TestFeedbackHandler_MethodNotAllowed(t *testing.T) {
