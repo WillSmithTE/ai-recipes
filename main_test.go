@@ -84,7 +84,7 @@ func TestHandleFeedback_Success(t *testing.T) {
 		t.Error("expected success to be true")
 	}
 
-	if resp.Message != "Thank you for your feedback!" {
+	if resp.Message != "Thank you for your feedback! We're glad you're enjoying the app." {
 		t.Errorf("unexpected message: %s", resp.Message)
 	}
 }
@@ -198,5 +198,43 @@ func TestCalculateAverageRating_Empty(t *testing.T) {
 
 	if avg != 0 {
 		t.Errorf("expected 0 for empty store, got %f", avg)
+	}
+}
+
+func TestHandleDashboard_CORS_Preflight(t *testing.T) {
+	req := httptest.NewRequest(http.MethodOptions, "/api/dashboard", nil)
+	w := httptest.NewRecorder()
+
+	handleDashboard(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("expected status 200 for OPTIONS, got %d", w.Code)
+	}
+
+	if got := w.Header().Get("Access-Control-Allow-Origin"); got != "*" {
+		t.Errorf("expected CORS origin '*', got '%s'", got)
+	}
+
+	if got := w.Header().Get("Access-Control-Allow-Methods"); got != "GET, OPTIONS" {
+		t.Errorf("expected CORS methods 'GET, OPTIONS', got '%s'", got)
+	}
+}
+
+func TestFeedbackThankYouMessage(t *testing.T) {
+	tests := []struct {
+		rating   int
+		expected string
+	}{
+		{4, "Thank you for your feedback! We're glad you're enjoying the app."},
+		{3, "Thank you for your feedback! We're glad you're enjoying the app."},
+		{2, "Thank you for your feedback! We'll use it to improve."},
+		{1, "Thank you for your feedback! We're sorry to hear about your experience and will work to do better."},
+	}
+
+	for _, tt := range tests {
+		got := feedbackThankYouMessage(tt.rating)
+		if got != tt.expected {
+			t.Errorf("feedbackThankYouMessage(%d) = %q, want %q", tt.rating, got, tt.expected)
+		}
 	}
 }

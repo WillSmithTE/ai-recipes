@@ -54,13 +54,21 @@ var (
 )
 
 func handleDashboard(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+	if r.Method == http.MethodOptions {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	feedbackStoreMu.Lock()
 	feedbackCount := len(feedbackStore)
@@ -123,13 +131,25 @@ func handleFeedback(w http.ResponseWriter, r *http.Request) {
 	now := time.Now().UTC()
 	resp := FeedbackResponse{
 		Success:   true,
-		Message:   "Thank you for your feedback!",
+		Message:   feedbackThankYouMessage(req.Rating),
 		ID:        now.Format("20060102150405"),
 		Timestamp: now.Format(time.RFC3339),
 	}
 
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(resp)
+}
+
+// feedbackThankYouMessage returns a personalized thank-you message based on the rating.
+func feedbackThankYouMessage(rating int) string {
+	switch {
+	case rating >= 3:
+		return "Thank you for your feedback! We're glad you're enjoying the app."
+	case rating == 2:
+		return "Thank you for your feedback! We'll use it to improve."
+	default:
+		return "Thank you for your feedback! We're sorry to hear about your experience and will work to do better."
+	}
 }
 
 // calculateAverageRating computes the average rating from stored feedback.
