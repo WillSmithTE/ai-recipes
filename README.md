@@ -7,10 +7,10 @@ Go backend for AI-Recipes
 
 ## API Endpoints
 
-| Method | Path         | Description                        |
-|--------|--------------|------------------------------------|
-| GET    | `/dashboard` | Returns dashboard summary data     |
-| POST   | `/feedback`  | Submits user feedback from widget  |
+| Method | Path             | Description                        |
+|--------|------------------|------------------------------------|
+| GET    | `/dashboard`     | Returns dashboard summary data     |
+| POST   | `/api/feedback`  | Submits user feedback from widget  |
 
 ## Getting Started
 
